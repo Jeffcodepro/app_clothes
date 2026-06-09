@@ -1,0 +1,61 @@
+<%= link_to product_path(product), class: "product-card #{'product-card--highlight' if local_assigns[:highlight]}" do %>
+  <div class="product-card__image">
+    <% if product.photos.attached? %>
+      <%= image_tag product.photos.first, alt: product.name %>
+    <% else %>
+      <div class="product-card__placeholder">
+        <span><%= product.name.first %></span>
+      </div>
+    <% end %>
+
+    <div class="product-card__badges">
+      <% if product.featured? %>
+        <span>Destaque</span>
+      <% end %>
+    </div>
+
+    <% if product.photos.attached? %>
+      <div class="product-card__photo-count">
+        <%= product.photos.count %> fotos
+      </div>
+    <% end %>
+  </div>
+
+  <div class="product-card__content">
+    <p class="product-card__category"><%= product.category.name %></p>
+
+    <div class="product-card__title-row">
+      <h3><%= product.name %></h3>
+      <span class="product-card__price">
+        <%= money_from_cents(product.display_price_cents) %>
+      </span>
+    </div>
+
+    <p class="product-card__description">
+      <%= truncate(product.description, length: 90) %>
+    </p>
+
+    <div class="product-card__meta">
+      <% if product.available_sizes.any? %>
+        <span>Tamanhos: <%= product.available_sizes.join(", ") %></span>
+      <% end %>
+
+      <% if product.available_colors.any? %>
+        <span>Cores: <%= product.available_colors.join(", ") %></span>
+      <% end %>
+    </div>
+
+    <div class="product-card__footer">
+      <div class="product-card__social">
+        <span>♡ <%= product.favorites.count %></span>
+        <span>♥ <%= product.likes.count %></span>
+      </div>
+
+      <% if product.in_stock? %>
+        <span class="product-card__stock product-card__stock--available">Disponível</span>
+      <% else %>
+        <span class="product-card__stock product-card__stock--empty">Esgotado</span>
+      <% end %>
+    </div>
+  </div>
+<% end %>

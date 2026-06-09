@@ -1,2 +1,123 @@
-<h1>Products#show</h1>
-<p>Find me in app/views/products/show.html.erb</p>
+<section class="product-show">
+  <div class="container">
+    <div class="product-show__navigation">
+      <%= link_to "← Voltar ao catálogo", products_path, class: "product-show__back-link" %>
+      <%= link_to "Página inicial", root_path, class: "product-show__home-link" %>
+    </div>
+    <div class="product-show__layout">
+      <div class="product-show__gallery">
+        <% if @product.photos.attached? %>
+          <%= image_tag @product.photos.first, alt: @product.name, class: "product-show__main-image" %>
+
+          <% if @product.photos.count > 1 %>
+            <div class="product-show__thumbs">
+              <% @product.photos.limit(5).each do |photo| %>
+                <div class="product-show__thumb">
+                  <%= image_tag photo, alt: @product.name %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="product-show__placeholder">
+            <span><%= @product.name.first %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="product-show__info">
+        <p class="product-show__category"><%= @product.category.name %></p>
+        <h1><%= @product.name %></h1>
+
+        <p class="product-show__price">
+          <%= money_from_cents(@product.display_price_cents) %>
+        </p>
+
+        <p class="product-show__description">
+          <%= @product.description %>
+        </p>
+        <div class="product-show__info-grid">
+          <div>
+            <span>Categoria</span>
+            <strong><%= @product.category.name %></strong>
+          </div>
+
+          <div>
+            <span>Estoque</span>
+            <strong>
+              <% if @product.in_stock? %>
+                Disponível
+              <% else %>
+                Esgotado
+              <% end %>
+            </strong>
+          </div>
+
+          <div>
+            <span>Fotos</span>
+            <strong><%= @product.photos.count %> de 5</strong>
+          </div>
+
+          <div>
+            <span>Coleção</span>
+            <strong><%= @product.section&.name || "Coleção principal" %></strong>
+          </div>
+        </div>
+
+        <div class="product-show__block">
+          <h2>Tamanhos disponíveis</h2>
+
+          <div class="size-options">
+            <% @variants.each do |variant| %>
+              <button type="button" class="size-option">
+                <%= variant.size %>
+              </button>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="product-show__block">
+          <h2>Cores disponíveis</h2>
+
+          <div class="color-options">
+            <% @variants.map(&:color).uniq.each do |color| %>
+              <span><%= color %></span>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="product-show__freight">
+          <h2>Frete</h2>
+          <p>Informe seu CEP no checkout para calcular prazo e valor de entrega.</p>
+        </div>
+
+        <div class="product-show__actions">
+          <button class="btn btn-dark btn-lg w-100">Adicionar ao carrinho</button>
+
+          <div class="product-show__social">
+            <button class="btn btn-outline-dark">♡ Favoritar</button>
+            <button class="btn btn-outline-dark">♥ Curtir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <% if @related_products.any? %>
+      <div class="related-products">
+        <div class="section-heading">
+          <div>
+            <p>Você também pode gostar</p>
+            <h2>Produtos relacionados</h2>
+          </div>
+        </div>
+
+        <div class="products-grid">
+          <% @related_products.each do |product| %>
+            <%= render "products/product_card", product: product %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>

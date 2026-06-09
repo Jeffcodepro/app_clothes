@@ -1,2 +1,73 @@
-<h1>Pages#home</h1>
-<p>Find me in app/views/pages/home.html.erb</p>
+<section class="home-hero">
+  <div class="container">
+    <div class="home-hero__content">
+      <p class="home-hero__eyebrow">Nova coleção</p>
+      <h1>Elegância, conforto e estilo em cada detalhe.</h1>
+      <p>
+        Descubra peças selecionadas para diferentes momentos, com uma experiência de compra simples, moderna e personalizada.
+      </p>
+
+      <div class="home-hero__actions">
+        <%= link_to "Ver catálogo", products_path, class: "btn btn-dark btn-lg" %>
+        <%= link_to "Novidades", products_path(category: "lingerie"), class: "btn btn-outline-dark btn-lg" %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="home-section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <p>Categorias</p>
+        <h2>Escolha por seção</h2>
+      </div>
+    </div>
+
+    <div class="category-pills">
+      <% @categories.each do |category| %>
+        <%= link_to category.name, products_path(category: category.slug), class: "category-pill" %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="home-section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <p>Destaques</p>
+        <h2>Peças selecionadas</h2>
+      </div>
+
+      <%= link_to "Ver tudo", products_path, class: "section-heading__link" %>
+    </div>
+
+    <div class="products-grid">
+      <% @featured_products.each_with_index do |product, index| %>
+        <%= render "products/product_card",
+            product: product,
+            highlight: (index + 1) % 5 == 0 %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="home-section home-section--soft">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <p>Novidades</p>
+        <h2>Acabaram de chegar</h2>
+      </div>
+    </div>
+
+    <div class="products-grid">
+      <% @new_products.each_with_index do |product, index| %>
+        <%= render "products/product_card",
+            product: product,
+            highlight: (index + 1) % 5 == 0 %>
+      <% end %>
+    </div>
+  </div>
+</section>
