@@ -1,2 +1,41 @@
-<h1>Products#index</h1>
-<p>Find me in app/views/products/index.html.erb</p>
+<section class="catalog-header">
+  <div class="container">
+    <p>Catálogo</p>
+
+    <% if @category %>
+      <h1><%= @category.name %></h1>
+    <% else %>
+      <h1>Todas as peças</h1>
+    <% end %>
+
+    <span><%= pluralize(@products.count, "produto encontrado", "produtos encontrados") %></span>
+  </div>
+</section>
+
+<section class="catalog-section">
+  <div class="container">
+    <div class="catalog-layout">
+      <aside class="catalog-sidebar">
+        <h2>Categorias</h2>
+
+        <%= link_to "Todas", products_path, class: "catalog-filter #{'active' unless params[:category].present?}" %>
+
+        <% @categories.each do |category| %>
+          <%= link_to category.name,
+              products_path(category: category.slug),
+              class: "catalog-filter #{'active' if params[:category] == category.slug}" %>
+        <% end %>
+      </aside>
+
+      <div class="catalog-content">
+        <div class="products-grid">
+          <% @products.each_with_index do |product, index| %>
+            <%= render "products/product_card",
+                product: product,
+                highlight: (index + 1) % 5 == 0 %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

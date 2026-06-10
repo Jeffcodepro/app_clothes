@@ -1,1 +1,190 @@
 // Specific CSS for your home-page
+.home-hero {
+  min-height: 72vh;
+  display: flex;
+  align-items: center;
+  background:
+    linear-gradient(90deg, rgba(255, 245, 245, 0.95), rgba(255, 245, 245, 0.65)),
+    radial-gradient(circle at 80% 20%, #e7c3ca, transparent 35%),
+    #f9eeee;
+  padding: 96px 0 72px;
+}
+
+.home-hero__content {
+  max-width: 680px;
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+    margin-bottom: 24px;
+    font-weight: 800;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: #5f5658;
+    max-width: 560px;
+  }
+}
+
+.home-hero__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem !important;
+  font-weight: 800;
+  color: #8f4f5f !important;
+  margin-bottom: 18px;
+}
+
+.home-hero__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.home-section {
+  padding: 72px 0;
+}
+
+.home-section--soft {
+  background: #fbf7f7;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 28px;
+
+  p {
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: #9a6872;
+    font-weight: 800;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    letter-spacing: -0.04em;
+    font-weight: 800;
+  }
+}
+
+.section-heading__link {
+  color: #111;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid #111;
+
+  &:hover {
+    color: #8f4f5f;
+    border-color: #8f4f5f;
+  }
+}
+
+.category-pills {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.category-pill {
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+
+  &:hover {
+    color: #fff;
+    background: #8f4f5f;
+  }
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 992px) {
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-hero {
+    min-height: auto;
+    padding: 72px 0 48px;
+  }
+
+  .home-hero__content {
+    h1 {
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .home-hero__actions {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  .home-section {
+    padding: 48px 0;
+  }
+
+  .category-pills {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .category-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-pill {
+    white-space: nowrap;
+  }
+
+}
+@media (max-width: 576px) {
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .product-card--highlight {
+    grid-column: 1 / -1;
+  }
+}
