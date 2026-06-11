@@ -7,11 +7,20 @@ class Product < ApplicationRecord
   has_many :product_variants, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :favorites, dependent: :destroy
+  has_many :cart_items, through: :product_variants
+  has_many :order_items, through: :product_variants
+  has_many :analytics_events, dependent: :nullify
+
   has_many_attached :photos
 
   validates :name, :slug, :description, :base_price_cents, presence: true
   validates :slug, uniqueness: true
   validates :base_price_cents, numericality: { greater_than_or_equal_to: 0 }
+
+  validate :photos_limit
+
+  scope :active, -> { where(active: true) }
+  scope :featured, -> { where(featured: true) }
 
   def to_param
     slug
@@ -35,6 +44,14 @@ class Product < ApplicationRecord
 
   def in_stock?
     total_stock.positive?
+  end
+
+  def likes_count
+    likes.size
+  end
+
+  def favorites_count
+    favorites.size
   end
 
   private

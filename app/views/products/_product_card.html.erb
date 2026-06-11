@@ -1,4 +1,13 @@
-<%= link_to product_path(product), class: "product-card #{'product-card--highlight' if local_assigns[:highlight]}" do %>
+<% size_groups = product.product_variants.select(&:active?).group_by(&:size) %>
+
+<article
+  class="product-card <%= 'product-card--highlight' if local_assigns[:highlight] %>"
+  data-controller="variant-selector product-card"
+  data-product-card-url-value="<%= product_path(product) %>"
+  data-action="click->product-card#open keydown->product-card#openWithKeyboard">
+
+  <%= hidden_field_tag :product_variant_id, nil, data: { variant_selector_target: "variantId" } %>
+
   <div class="product-card__image">
     <% if product.photos.attached? %>
       <%= image_tag product.photos.first, alt: product.name %>
@@ -26,6 +35,7 @@
 
     <div class="product-card__title-row">
       <h3><%= product.name %></h3>
+
       <span class="product-card__price">
         <%= money_from_cents(product.display_price_cents) %>
       </span>
@@ -35,11 +45,35 @@
       <%= truncate(product.description, length: 90) %>
     </p>
 
-    <div class="product-card__meta">
-      <% if product.available_sizes.any? %>
-        <span>Tamanhos: <%= product.available_sizes.join(", ") %></span>
-      <% end %>
+    <% if size_groups.any? %>
+      <div class="product-card__sizes" data-no-card-link>
+        <div class="product-card__sizes-header">
+          <span>Tamanho</span>
+          <small data-variant-selector-target="selectedSize">Selecione</small>
+        </div>
 
+        <div class="product-card__size-options">
+          <% size_groups.each do |size, variants| %>
+            <% stock = variants.sum(&:stock_quantity) %>
+            <% variant = variants.first %>
+
+            <button
+              type="button"
+              class="product-card__size-option"
+              data-no-card-link
+              data-variant-selector-target="button"
+              data-action="click->variant-selector#select"
+              data-size="<%= size %>"
+              data-variant-id="<%= variant.id %>"
+              <%= "disabled" if stock.zero? %>>
+              <%= size %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="product-card__meta">
       <% if product.available_colors.any? %>
         <span>Cores: <%= product.available_colors.join(", ") %></span>
       <% end %>
@@ -57,5 +91,12 @@
         <span class="product-card__stock product-card__stock--empty">Esgotado</span>
       <% end %>
     </div>
+
+    <button
+      type="button"
+      class="product-card__cart-button"
+      data-no-card-link>
+      Adicionar ao carrinho
+    </button>
   </div>
-<% end %>
+</article>

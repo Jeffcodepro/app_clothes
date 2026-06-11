@@ -2,32 +2,17 @@
   <div class="container">
     <div class="home-hero__content">
       <p class="home-hero__eyebrow">Nova coleção</p>
+
       <h1>Elegância, conforto e estilo em cada detalhe.</h1>
+
       <p>
         Descubra peças selecionadas para diferentes momentos, com uma experiência de compra simples, moderna e personalizada.
       </p>
 
       <div class="home-hero__actions">
         <%= link_to "Ver catálogo", products_path, class: "btn btn-dark btn-lg" %>
-        <%= link_to "Novidades", products_path(category: "lingerie"), class: "btn btn-outline-dark btn-lg" %>
+        <%= link_to "Conhecer novidades", products_path(section: "novidades"), class: "btn btn-outline-dark btn-lg" %>
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="home-section">
-  <div class="container">
-    <div class="section-heading">
-      <div>
-        <p>Categorias</p>
-        <h2>Escolha por seção</h2>
-      </div>
-    </div>
-
-    <div class="category-pills">
-      <% @categories.each do |category| %>
-        <%= link_to category.name, products_path(category: category.slug), class: "category-pill" %>
-      <% end %>
     </div>
   </div>
 </section>
@@ -43,13 +28,19 @@
       <%= link_to "Ver tudo", products_path, class: "section-heading__link" %>
     </div>
 
-    <div class="products-grid">
-      <% @featured_products.each_with_index do |product, index| %>
-        <%= render "products/product_card",
-            product: product,
-            highlight: (index + 1) % 5 == 0 %>
-      <% end %>
-    </div>
+    <% if @featured_products.any? %>
+      <div class="products-grid">
+        <% @featured_products.each_with_index do |product, index| %>
+          <%= render "products/product_card",
+              product: product,
+              highlight: (index + 1) % 5 == 0 %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <p>Nenhum produto em destaque foi cadastrado ainda.</p>
+      </div>
+    <% end %>
   </div>
 </section>
 
@@ -60,14 +51,46 @@
         <p>Novidades</p>
         <h2>Acabaram de chegar</h2>
       </div>
+
+      <%= link_to "Explorar catálogo", products_path, class: "section-heading__link" %>
     </div>
 
-    <div class="products-grid">
-      <% @new_products.each_with_index do |product, index| %>
-        <%= render "products/product_card",
-            product: product,
-            highlight: (index + 1) % 5 == 0 %>
-      <% end %>
+    <% if @new_products.any? %>
+      <div class="products-grid">
+        <% @new_products.each_with_index do |product, index| %>
+          <%= render "products/product_card",
+              product: product,
+              highlight: (index + 1) % 5 == 0 %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state">
+        <p>Nenhum produto foi cadastrado ainda.</p>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<section class="home-section">
+  <div class="container">
+    <div class="home-benefits">
+      <div class="home-benefit">
+        <span>01</span>
+        <h3>Peças selecionadas</h3>
+        <p>Produtos organizados por gênero, categoria, tamanho, cores e coleções.</p>
+      </div>
+
+      <div class="home-benefit">
+        <span>02</span>
+        <h3>Favoritos e curtidas</h3>
+        <p>Salve suas peças preferidas e acompanhe os produtos mais desejados.</p>
+      </div>
+
+      <div class="home-benefit">
+        <span>03</span>
+        <h3>Compra simples</h3>
+        <p>Escolha o tamanho, veja os detalhes e avance para o carrinho com facilidade.</p>
+      </div>
     </div>
   </div>
 </section>
