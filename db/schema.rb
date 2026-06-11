@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_06_08_223055) do
+ActiveRecord::Schema[7.1].define(version: 2026_06_11_004903) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -101,6 +101,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_08_223055) do
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "gender_id", null: false
+    t.index ["gender_id"], name: "index_categories_on_gender_id"
   end
 
   create_table "favorites", force: :cascade do |t|
@@ -112,6 +114,15 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_08_223055) do
     t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
+  create_table "genders", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.integer "position"
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "likes", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "product_id", null: false
@@ -119,6 +130,15 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_08_223055) do
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_likes_on_product_id"
     t.index ["user_id"], name: "index_likes_on_user_id"
+  end
+
+  create_table "navbar_promotions", force: :cascade do |t|
+    t.string "text"
+    t.string "link_url"
+    t.boolean "active"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "order_items", force: :cascade do |t|
@@ -210,6 +230,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_08_223055) do
   add_foreign_key "cart_items", "carts"
   add_foreign_key "cart_items", "product_variants"
   add_foreign_key "carts", "users"
+  add_foreign_key "categories", "genders"
   add_foreign_key "favorites", "products"
   add_foreign_key "favorites", "users"
   add_foreign_key "likes", "products"

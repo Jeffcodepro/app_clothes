@@ -1,38 +1,246 @@
-<nav class="navbar navbar-expand-sm navbar-light navbar-lewagon">
-  <div class="container-fluid">
-    <%= link_to "#", class: "navbar-brand" do %>
-      <%= image_tag "https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/logo.png" %>
-    <% end %>
+<nav
+  class="store-navbar"
+  data-controller="mobile-menu"
+  data-action="keydown@window->mobile-menu#closeWithKeyboard">
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+  <% if user_signed_in? %>
+    <div class="store-navbar__top">
+      <div class="container store-navbar__top-inner">
+        <div class="store-navbar__top-links">
+          <%= link_to "ajuda", "#" %>
+          <%= link_to "histórico de pedidos", orders_path %>
+          <%= link_to "minha conta", edit_user_registration_path %>
+          <%= link_to "sair", destroy_user_session_path, data: { turbo_method: :delete } %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto">
-        <% if user_signed_in? %>
-          <li class="nav-item active">
-            <%= link_to "Home", "#", class: "nav-link" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Messages", "#", class: "nav-link" %>
-          </li>
-          <li class="nav-item dropdown">
-          <a href="#" class="avatar" id="navbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <%= image_tag "https://kitt.lewagon.com/placeholder/users/ssaunier", class: "avatar", alt: "dropdown menu" %>
-          </a>
-            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-              <%= link_to "Action", "#", class: "dropdown-item" %>
-              <%= link_to "Another action", "#", class: "dropdown-item" %>
-              <%= link_to "Log out", destroy_user_session_path, data: {turbo_method: :delete}, class: "dropdown-item" %>
+  <div class="store-navbar__main">
+    <div class="container store-navbar__main-inner">
+      <button
+        type="button"
+        class="store-navbar__menu-button"
+        aria-label="Abrir menu"
+        data-action="click->mobile-menu#open">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <%= link_to root_path, class: "store-navbar__brand", aria: { label: "Página inicial" } do %>
+        <span class="store-navbar__brand-main">AURA</span>
+        <span class="store-navbar__brand-sub">LINGERIE</span>
+      <% end %>
+
+      <div class="store-navbar__desktop-links">
+        <% (@navbar_genders || []).each do |gender| %>
+          <% categories = (@navbar_categories || []).select { |category| category.gender_id == gender.id } %>
+
+          <div class="store-navbar__nav-item">
+            <%= link_to gender.name.upcase,
+                products_path(gender: gender.slug),
+                class: "store-navbar__nav-link" %>
+
+            <div class="store-navbar__mega-menu">
+              <div class="container store-navbar__mega-inner">
+                <div class="store-navbar__mega-column store-navbar__mega-column--featured">
+                  <h3>Destaques</h3>
+
+                  <%= link_to "Novidades", products_path(gender: gender.slug, section: "novidades") %>
+                  <%= link_to "Mais vendidos", products_path(gender: gender.slug, section: "destaques-da-semana") %>
+                  <%= link_to "Conforto diário", products_path(gender: gender.slug, section: "conforto-diario") %>
+                  <%= link_to "Promoções", products_path(gender: gender.slug, section: "promocoes") %>
+                </div>
+
+                <div class="store-navbar__mega-column">
+                  <h3>Categorias</h3>
+
+                  <% categories.each do |category| %>
+                    <%= link_to category.name,
+                        products_path(gender: gender.slug, category: category.slug) %>
+                  <% end %>
+                </div>
+
+                <div class="store-navbar__mega-column">
+                  <h3>Seções</h3>
+
+                  <% (@navbar_sections || []).each do |section| %>
+                    <%= link_to section.name,
+                        products_path(gender: gender.slug, section: section.slug) %>
+                  <% end %>
+                </div>
+
+                <div class="store-navbar__mega-column store-navbar__mega-column--cta">
+                  <h3><%= gender.name %></h3>
+
+                  <p>
+                    Explore peças selecionadas por categoria, coleção e estilo.
+                  </p>
+
+                  <%= link_to "Ver tudo de #{gender.name}",
+                      products_path(gender: gender.slug),
+                      class: "store-navbar__mega-button" %>
+                </div>
+              </div>
             </div>
-          </li>
-        <% else %>
-          <li class="nav-item">
-            <%= link_to "Login", new_user_session_path, class: "nav-link" %>
-          </li>
+          </div>
         <% end %>
-      </ul>
+
+        <% promotion_text = @navbar_promotion&.text.presence || "ATÉ 40% OFF♡" %>
+        <% promotion_link = @navbar_promotion&.link_url.presence || products_path(section: "promocoes") %>
+
+        <div class="store-navbar__nav-item">
+          <%= link_to promotion_text.upcase,
+              promotion_link,
+              class: "store-navbar__nav-link store-navbar__promo-link" %>
+        </div>
+      </div>
+
+      <div class="store-navbar__actions">
+        <%= form_with url: products_path, method: :get, local: true, class: "store-navbar__search" do %>
+          <%= text_field_tag :query, params[:query], placeholder: "Procurar", class: "store-navbar__search-input" %>
+
+          <button type="submit" class="store-navbar__search-button" aria-label="Pesquisar">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="M16.5 16.5L21 21"></path>
+            </svg>
+          </button>
+        <% end %>
+
+        <% if user_signed_in? %>
+          <%= link_to edit_user_registration_path, class: "store-navbar__icon-link", aria: { label: "Minha conta" } do %>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="7" r="4"></circle>
+              <path d="M4 21c1.6-4.5 14.4-4.5 16 0"></path>
+            </svg>
+          <% end %>
+        <% else %>
+          <%= link_to new_user_session_path, class: "store-navbar__icon-link", aria: { label: "Entrar" } do %>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="7" r="4"></circle>
+              <path d="M4 21c1.6-4.5 14.4-4.5 16 0"></path>
+            </svg>
+          <% end %>
+        <% end %>
+
+        <%= link_to products_path, class: "store-navbar__icon-link store-navbar__icon-link--desktop", aria: { label: "Favoritos" } do %>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s-8-5.4-8-12a4.6 4.6 0 0 1 8-3.1A4.6 4.6 0 0 1 20 9c0 6.6-8 12-8 12z"></path>
+          </svg>
+
+          <% if user_signed_in? && current_user.respond_to?(:favorites) %>
+            <span class="store-navbar__counter"><%= current_user.favorites.count %></span>
+          <% end %>
+        <% end %>
+
+        <%= link_to cart_path, class: "store-navbar__icon-link", aria: { label: "Carrinho" } do %>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 8h12l-1 13H7L6 8z"></path>
+            <path d="M9 8a3 3 0 0 1 6 0"></path>
+          </svg>
+
+          <% if user_signed_in? && current_user.cart.present? %>
+            <span class="store-navbar__counter"><%= current_user.cart.cart_items.sum(:quantity) %></span>
+          <% else %>
+            <span class="store-navbar__counter">0</span>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
+
+  <div
+    class="mobile-menu-overlay"
+    data-mobile-menu-target="overlay"
+    data-action="click->mobile-menu#close">
+  </div>
+
+  <aside
+    class="mobile-menu"
+    data-mobile-menu-target="menu"
+    aria-hidden="true">
+
+    <div class="mobile-menu__header">
+      <%= link_to root_path, class: "mobile-menu__brand" do %>
+        AURA
+      <% end %>
+
+      <button
+        type="button"
+        class="mobile-menu__close"
+        aria-label="Fechar menu"
+        data-action="click->mobile-menu#close">
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <div class="mobile-menu__body">
+      <div class="mobile-menu__panel is-active" data-mobile-menu-target="rootPanel">
+        <%= link_to products_path, class: "mobile-menu__featured-link" do %>
+          Ver todo o catálogo
+        <% end %>
+
+        <% promotion_text = @navbar_promotion&.text.presence || "Até 40% OFF♡" %>
+        <% promotion_link = @navbar_promotion&.link_url.presence || products_path(section: "promocoes") %>
+
+        <%= link_to promotion_link, class: "mobile-menu__row mobile-menu__row--accent" do %>
+          <span><%= promotion_text.upcase %></span>
+          <strong>›</strong>
+        <% end %>
+
+        <% (@navbar_genders || []).each do |gender| %>
+          <button
+            type="button"
+            class="mobile-menu__row mobile-menu__row-button"
+            data-gender-slug="<%= gender.slug %>"
+            data-action="click->mobile-menu#showGender">
+            <span><%= gender.name.upcase %></span>
+            <strong>›</strong>
+          </button>
+        <% end %>
+      </div>
+
+      <% (@navbar_genders || []).each do |gender| %>
+        <div
+          class="mobile-menu__panel"
+          data-mobile-menu-target="genderPanel"
+          data-gender-slug="<%= gender.slug %>">
+
+          <button
+            type="button"
+            class="mobile-menu__back"
+            data-action="click->mobile-menu#backToRoot">
+            ← Voltar
+          </button>
+
+          <%= link_to products_path(gender: gender.slug), class: "mobile-menu__featured-link" do %>
+            <%= gender.name.upcase %>
+          <% end %>
+
+          <% categories = (@navbar_categories_by_gender || {})[gender] || [] %>
+
+          <% categories.each do |category| %>
+            <%= link_to products_path(gender: gender.slug, category: category.slug), class: "mobile-menu__row" do %>
+              <span><%= category.name.upcase %></span>
+              <strong>›</strong>
+            <% end %>
+          <% end %>
+
+          <% if (@navbar_sections || []).any? %>
+            <div class="mobile-menu__divider"></div>
+
+            <% @navbar_sections.each do |section| %>
+              <%= link_to products_path(gender: gender.slug, section: section.slug), class: "mobile-menu__row mobile-menu__row--soft" do %>
+                <span><%= section.name.upcase %></span>
+                <strong>›</strong>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </aside>
 </nav>

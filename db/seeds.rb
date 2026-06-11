@@ -12,6 +12,8 @@ puts "Cleaning database..."
   Product
   Section
   Category
+  Gender
+  NavbarPromotion
   Address
   User
 ].each do |class_name|
@@ -42,48 +44,134 @@ customer = User.create!(
   role: :customer
 )
 
+puts "Creating genders..."
+
+feminino = Gender.create!(
+  name: "Feminino",
+  slug: "feminino",
+  position: 1,
+  active: true
+)
+
+masculino = Gender.create!(
+  name: "Masculino",
+  slug: "masculino",
+  position: 2,
+  active: true
+)
+
+infantil = Gender.create!(
+  name: "Infantil",
+  slug: "infantil",
+  position: 3,
+  active: true
+)
+
+puts "Creating navbar promotion..."
+
+NavbarPromotion.create!(
+  text: "Até 40% OFF♡",
+  link_url: "/products?section=promocoes",
+  position: 1,
+  active: true
+)
+
 puts "Creating categories..."
 
 categories = {
-  lingerie: Category.create!(
+  lingerie_feminina: Category.create!(
     name: "Lingerie",
-    slug: "lingerie",
+    slug: "lingerie-feminina",
+    gender: feminino,
     position: 1,
     active: true
   ),
 
-  conjuntos: Category.create!(
+  conjuntos_femininos: Category.create!(
     name: "Conjuntos",
-    slug: "conjuntos",
+    slug: "conjuntos-femininos",
+    gender: feminino,
     position: 2,
     active: true
   ),
 
-  bodies: Category.create!(
+  bodies_femininos: Category.create!(
     name: "Bodies",
-    slug: "bodies",
+    slug: "bodies-femininos",
+    gender: feminino,
     position: 3,
     active: true
   ),
 
-  pijamas: Category.create!(
+  pijamas_femininos: Category.create!(
     name: "Pijamas",
-    slug: "pijamas",
+    slug: "pijamas-femininos",
+    gender: feminino,
     position: 4,
     active: true
   ),
 
-  robes: Category.create!(
+  robes_femininos: Category.create!(
     name: "Robes",
-    slug: "robes",
+    slug: "robes-femininos",
+    gender: feminino,
     position: 5,
     active: true
   ),
 
-  basicos: Category.create!(
-    name: "Básicos",
-    slug: "basicos",
-    position: 6,
+  cuecas_masculinas: Category.create!(
+    name: "Cuecas",
+    slug: "cuecas-masculinas",
+    gender: masculino,
+    position: 1,
+    active: true
+  ),
+
+  pijamas_masculinos: Category.create!(
+    name: "Pijamas",
+    slug: "pijamas-masculinos",
+    gender: masculino,
+    position: 2,
+    active: true
+  ),
+
+  camisetas_masculinas: Category.create!(
+    name: "Camisetas",
+    slug: "camisetas-masculinas",
+    gender: masculino,
+    position: 3,
+    active: true
+  ),
+
+  meias_masculinas: Category.create!(
+    name: "Meias",
+    slug: "meias-masculinas",
+    gender: masculino,
+    position: 4,
+    active: true
+  ),
+
+  pijamas_infantis: Category.create!(
+    name: "Pijamas",
+    slug: "pijamas-infantis",
+    gender: infantil,
+    position: 1,
+    active: true
+  ),
+
+  conjuntos_infantis: Category.create!(
+    name: "Conjuntos",
+    slug: "conjuntos-infantis",
+    gender: infantil,
+    position: 2,
+    active: true
+  ),
+
+  meias_infantis: Category.create!(
+    name: "Meias",
+    slug: "meias-infantis",
+    gender: infantil,
+    position: 3,
     active: true
   )
 }
@@ -167,7 +255,7 @@ products_data = [
     name: "Conjunto Aurora",
     description: "Conjunto delicado com acabamento premium, pensado para unir conforto, elegância e uso versátil no dia a dia.",
     price_cents: 12990,
-    category: categories[:conjuntos],
+    category: categories[:conjuntos_femininos],
     section: sections[:novidades],
     featured: true,
     variants: [
@@ -181,7 +269,7 @@ products_data = [
     name: "Conjunto Serena",
     description: "Modelo leve e confortável, com visual clean e acabamento suave para uma experiência agradável de uso.",
     price_cents: 9990,
-    category: categories[:conjuntos],
+    category: categories[:conjuntos_femininos],
     section: sections[:conforto],
     featured: true,
     variants: [
@@ -192,24 +280,10 @@ products_data = [
     ]
   },
   {
-    name: "Conjunto Luna",
-    description: "Peça com design moderno e detalhes sutis, ideal para quem busca sofisticação sem abrir mão do conforto.",
-    price_cents: 13990,
-    category: categories[:conjuntos],
-    section: sections[:premium],
-    featured: true,
-    variants: [
-      { size: "P", color: "Vinho", stock: 4 },
-      { size: "M", color: "Vinho", stock: 7 },
-      { size: "G", color: "Vinho", stock: 5 },
-      { size: "M", color: "Nude", stock: 6 }
-    ]
-  },
-  {
     name: "Body Elegance",
     description: "Body com caimento elegante, acabamento estruturado e proposta sofisticada para composições versáteis.",
     price_cents: 15990,
-    category: categories[:bodies],
+    category: categories[:bodies_femininos],
     section: sections[:premium],
     featured: true,
     variants: [
@@ -219,38 +293,10 @@ products_data = [
     ]
   },
   {
-    name: "Body Amelie",
-    description: "Modelo confortável com visual refinado, pensado para valorizar produções casuais e elegantes.",
-    price_cents: 14990,
-    category: categories[:bodies],
-    section: sections[:novidades],
-    featured: false,
-    variants: [
-      { size: "P", color: "Nude", stock: 5 },
-      { size: "M", color: "Nude", stock: 9 },
-      { size: "G", color: "Nude", stock: 5 },
-      { size: "GG", color: "Nude", stock: 2 }
-    ]
-  },
-  {
-    name: "Body Minimal",
-    description: "Body básico com acabamento discreto, ideal para quem procura uma peça funcional e fácil de combinar.",
-    price_cents: 11990,
-    category: categories[:bodies],
-    section: sections[:conforto],
-    featured: false,
-    variants: [
-      { size: "P", color: "Preto", stock: 10 },
-      { size: "M", color: "Preto", stock: 12 },
-      { size: "G", color: "Preto", stock: 8 },
-      { size: "GG", color: "Preto", stock: 4 }
-    ]
-  },
-  {
-    name: "Pijama Cloud",
+    name: "Pijama Cloud Feminino",
     description: "Pijama de toque macio, com modelagem confortável e proposta ideal para noites tranquilas.",
     price_cents: 17990,
-    category: categories[:pijamas],
+    category: categories[:pijamas_femininos],
     section: sections[:conforto],
     featured: true,
     variants: [
@@ -261,37 +307,10 @@ products_data = [
     ]
   },
   {
-    name: "Pijama Noite Serena",
-    description: "Conjunto de dormir com visual delicado, tecido confortável e acabamento pensado para uso prolongado.",
-    price_cents: 18990,
-    category: categories[:pijamas],
-    section: sections[:novidades],
-    featured: false,
-    variants: [
-      { size: "P", color: "Azul claro", stock: 4 },
-      { size: "M", color: "Azul claro", stock: 8 },
-      { size: "G", color: "Azul claro", stock: 6 }
-    ]
-  },
-  {
-    name: "Pijama Essencial",
-    description: "Modelo básico, confortável e prático para a rotina, com excelente custo-benefício.",
-    price_cents: 12990,
-    category: categories[:pijamas],
-    section: sections[:promocao],
-    featured: false,
-    variants: [
-      { size: "P", color: "Cinza", stock: 10 },
-      { size: "M", color: "Cinza", stock: 13 },
-      { size: "G", color: "Cinza", stock: 9 },
-      { size: "GG", color: "Cinza", stock: 4 }
-    ]
-  },
-  {
     name: "Robe Belle",
     description: "Robe leve com acabamento elegante, ideal para compor momentos de descanso com estilo.",
     price_cents: 19990,
-    category: categories[:robes],
+    category: categories[:robes_femininos],
     section: sections[:premium],
     featured: true,
     variants: [
@@ -301,80 +320,10 @@ products_data = [
     ]
   },
   {
-    name: "Robe Soft",
-    description: "Robe macio e confortável, com caimento leve e visual minimalista.",
-    price_cents: 16990,
-    category: categories[:robes],
-    section: sections[:conforto],
-    featured: false,
-    variants: [
-      { size: "P", color: "Off-white", stock: 5 },
-      { size: "M", color: "Off-white", stock: 7 },
-      { size: "G", color: "Off-white", stock: 4 },
-      { size: "GG", color: "Off-white", stock: 2 }
-    ]
-  },
-  {
-    name: "Top Daily",
-    description: "Top básico com sustentação confortável e visual discreto para uso cotidiano.",
-    price_cents: 7990,
-    category: categories[:basicos],
-    section: sections[:conforto],
-    featured: false,
-    variants: [
-      { size: "P", color: "Preto", stock: 15 },
-      { size: "M", color: "Preto", stock: 18 },
-      { size: "G", color: "Preto", stock: 12 },
-      { size: "GG", color: "Preto", stock: 6 }
-    ]
-  },
-  {
-    name: "Top Cotton",
-    description: "Top em proposta casual, com toque suave e modelagem pensada para conforto durante o dia.",
-    price_cents: 6990,
-    category: categories[:basicos],
-    section: sections[:promocao],
-    featured: false,
-    variants: [
-      { size: "P", color: "Branco", stock: 14 },
-      { size: "M", color: "Branco", stock: 17 },
-      { size: "G", color: "Branco", stock: 11 },
-      { size: "GG", color: "Branco", stock: 5 }
-    ]
-  },
-  {
-    name: "Calcinha Comfort",
-    description: "Peça básica com acabamento macio, ideal para quem valoriza conforto e praticidade.",
-    price_cents: 3990,
-    category: categories[:lingerie],
-    section: sections[:conforto],
-    featured: false,
-    variants: [
-      { size: "P", color: "Nude", stock: 20 },
-      { size: "M", color: "Nude", stock: 25 },
-      { size: "G", color: "Nude", stock: 18 },
-      { size: "GG", color: "Nude", stock: 10 }
-    ]
-  },
-  {
-    name: "Calcinha Classic",
-    description: "Modelo clássico com visual discreto, acabamento limpo e excelente opção para o dia a dia.",
-    price_cents: 3490,
-    category: categories[:lingerie],
-    section: sections[:promocao],
-    featured: false,
-    variants: [
-      { size: "P", color: "Preto", stock: 22 },
-      { size: "M", color: "Preto", stock: 25 },
-      { size: "G", color: "Preto", stock: 15 },
-      { size: "GG", color: "Preto", stock: 8 }
-    ]
-  },
-  {
     name: "Sutiã Essential",
     description: "Sutiã básico com proposta confortável, acabamento discreto e boa sustentação para o uso diário.",
     price_cents: 8990,
-    category: categories[:lingerie],
+    category: categories[:lingerie_feminina],
     section: sections[:conforto],
     featured: false,
     variants: [
@@ -385,30 +334,100 @@ products_data = [
     ]
   },
   {
-    name: "Sutiã Soft Touch",
-    description: "Modelo com toque suave e visual moderno, pensado para equilibrar conforto e estilo.",
-    price_cents: 9990,
-    category: categories[:lingerie],
-    section: sections[:novidades],
-    featured: false,
+    name: "Cueca Boxer Classic",
+    description: "Cueca boxer confortável para o dia a dia, com tecido macio e ótimo ajuste ao corpo.",
+    price_cents: 4990,
+    category: categories[:cuecas_masculinas],
+    section: sections[:conforto],
+    featured: true,
     variants: [
-      { size: "P", color: "Rosa claro", stock: 7 },
-      { size: "M", color: "Rosa claro", stock: 9 },
-      { size: "G", color: "Rosa claro", stock: 5 }
+      { size: "P", color: "Preto", stock: 16 },
+      { size: "M", color: "Preto", stock: 20 },
+      { size: "G", color: "Preto", stock: 14 },
+      { size: "GG", color: "Preto", stock: 8 }
     ]
   },
   {
-    name: "Conjunto Florence",
-    description: "Conjunto refinado com visual delicado, acabamento de qualidade e proposta elegante.",
-    price_cents: 14990,
-    category: categories[:conjuntos],
-    section: sections[:premium],
+    name: "Cueca Slip Essential",
+    description: "Modelo slip com visual discreto, ajuste confortável e acabamento resistente.",
+    price_cents: 3990,
+    category: categories[:cuecas_masculinas],
+    section: sections[:promocao],
+    featured: false,
+    variants: [
+      { size: "P", color: "Cinza", stock: 14 },
+      { size: "M", color: "Cinza", stock: 18 },
+      { size: "G", color: "Cinza", stock: 13 },
+      { size: "GG", color: "Cinza", stock: 6 }
+    ]
+  },
+  {
+    name: "Pijama Masculino Comfort",
+    description: "Pijama masculino com modelagem confortável para noites tranquilas e uso casual em casa.",
+    price_cents: 15990,
+    category: categories[:pijamas_masculinos],
+    section: sections[:novidades],
     featured: true,
     variants: [
-      { size: "P", color: "Azul marinho", stock: 4 },
-      { size: "M", color: "Azul marinho", stock: 6 },
-      { size: "G", color: "Azul marinho", stock: 3 },
-      { size: "M", color: "Vinho", stock: 5 }
+      { size: "P", color: "Azul marinho", stock: 6 },
+      { size: "M", color: "Azul marinho", stock: 10 },
+      { size: "G", color: "Azul marinho", stock: 8 },
+      { size: "GG", color: "Azul marinho", stock: 4 }
+    ]
+  },
+  {
+    name: "Camiseta Homewear Masculina",
+    description: "Camiseta leve e macia para momentos de descanso, com visual minimalista e confortável.",
+    price_cents: 7990,
+    category: categories[:camisetas_masculinas],
+    section: sections[:conforto],
+    featured: false,
+    variants: [
+      { size: "P", color: "Branco", stock: 10 },
+      { size: "M", color: "Branco", stock: 14 },
+      { size: "G", color: "Branco", stock: 9 },
+      { size: "GG", color: "Branco", stock: 5 }
+    ]
+  },
+  {
+    name: "Pijama Infantil Nuvem",
+    description: "Pijama infantil confortável, com toque macio e visual delicado para noites tranquilas.",
+    price_cents: 9990,
+    category: categories[:pijamas_infantis],
+    section: sections[:novidades],
+    featured: true,
+    variants: [
+      { size: "2", color: "Azul claro", stock: 6 },
+      { size: "4", color: "Azul claro", stock: 8 },
+      { size: "6", color: "Azul claro", stock: 5 },
+      { size: "8", color: "Azul claro", stock: 4 }
+    ]
+  },
+  {
+    name: "Conjunto Infantil Soft",
+    description: "Conjunto infantil para descanso e rotina, com modelagem confortável e tecido leve.",
+    price_cents: 11990,
+    category: categories[:conjuntos_infantis],
+    section: sections[:conforto],
+    featured: false,
+    variants: [
+      { size: "2", color: "Rosa", stock: 5 },
+      { size: "4", color: "Rosa", stock: 7 },
+      { size: "6", color: "Rosa", stock: 5 },
+      { size: "8", color: "Rosa", stock: 3 }
+    ]
+  },
+  {
+    name: "Kit Meias Infantil",
+    description: "Kit de meias infantis com toque macio, ideal para uso diário.",
+    price_cents: 3990,
+    category: categories[:meias_infantis],
+    section: sections[:promocao],
+    featured: false,
+    variants: [
+      { size: "2-4", color: "Colorido", stock: 12 },
+      { size: "6-8", color: "Colorido", stock: 10 },
+      { size: "10-12", color: "Colorido", stock: 8 }
     ]
   }
 ]
@@ -436,8 +455,10 @@ end
 
 puts "Done!"
 puts "Created #{User.count} users"
+puts "Created #{Gender.count} genders"
 puts "Created #{Category.count} categories"
 puts "Created #{Section.count} sections"
+puts "Created #{NavbarPromotion.count} navbar promotions"
 puts "Created #{Product.count} products"
 puts "Created #{ProductVariant.count} product variants"
 puts ""
