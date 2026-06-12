@@ -1,7 +1,13 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, controllers: {
+    omniauth_callbacks: "users/omniauth_callbacks"
+  }
 
   root to: "pages#home"
+
+  get "mais-vendidos-da-semana", to: "best_sellers#index", as: :weekly_best_sellers
+
+  resource :liked_products, only: [:show]
 
   resources :products, only: [:index, :show] do
     resource :like, only: [:create, :destroy]

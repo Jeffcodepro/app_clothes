@@ -1,2 +1,178 @@
-<h1>Carts#show</h1>
-<p>Find me in app/views/carts/show.html.erb</p>
+<section class="cart-page">
+  <div class="container">
+    <div class="cart-page__header">
+      <div>
+        <p>Carrinho</p>
+        <h1>Minha sacola</h1>
+      </div>
+
+      <%= link_to "Continuar comprando", products_path, class: "cart-page__continue-link" %>
+    </div>
+
+    <% if @cart_items.any? %>
+      <div class="cart-page__layout">
+        <div class="cart-items">
+          <% @cart_items.each do |item| %>
+            <% variant = item.product_variant %>
+            <% product = variant.product %>
+            <% available_variants = product.product_variants.select { |product_variant| product_variant.active? && product_variant.stock_quantity.positive? } %>
+
+            <% variants_payload = available_variants.map do |product_variant|
+              {
+                id: product_variant.id,
+                size: product_variant.size.to_s,
+                color: product_variant.color.to_s,
+                stock: product_variant.stock_quantity,
+                price_cents: product_variant.price_cents
+              }
+            end %>
+
+            <% available_sizes = available_variants.map { |product_variant| product_variant.size.to_s }.uniq %>
+            <% available_colors_for_current_size = available_variants.select { |product_variant| product_variant.size.to_s == variant.size.to_s }.map { |product_variant| product_variant.color.to_s }.uniq %>
+            <% available_colors_for_current_size = available_variants.map { |product_variant| product_variant.color.to_s }.uniq if available_colors_for_current_size.empty? %>
+
+            <article
+              class="cart-item"
+              data-controller="cart-item"
+              data-cart-item-variants-value="<%= json_escape(variants_payload.to_json) %>">
+
+              <%= link_to product_path(product), class: "cart-item__image" do %>
+                <% if product.photos.attached? %>
+                  <%= image_tag product.photos.first, alt: product.name %>
+                <% else %>
+                  <div class="cart-item__placeholder">
+                    <span><%= product.name.first %></span>
+                  </div>
+                <% end %>
+              <% end %>
+
+              <%= form_with url: cart_item_path(item),
+                  method: :patch,
+                  local: true,
+                  class: "cart-item__content",
+                  data: { cart_item_target: "form" } do %>
+
+                <%= hidden_field_tag :product_variant_id,
+                    variant.id,
+                    data: { cart_item_target: "variantId" } %>
+
+                <div class="cart-item__main">
+                  <p class="cart-item__category"><%= product.category.name %></p>
+
+                  <h2>
+                    <%= link_to product.name, product_path(product) %>
+                  </h2>
+
+                  <% if available_variants.any? %>
+                    <div class="cart-item__selectors">
+                      <label class="cart-item__selector">
+                        <span>Tamanho</span>
+
+                        <div class="cart-item__select-wrapper">
+                          <%= select_tag :size,
+                              options_for_select(available_sizes, variant.size.to_s),
+                              class: "cart-item__select",
+                              data: {
+                                cart_item_target: "sizeSelect",
+                                action: "change->cart-item#changeSize"
+                              } %>
+                        </div>
+                      </label>
+
+                      <label class="cart-item__selector">
+                        <span>Cor</span>
+
+                        <div class="cart-item__select-wrapper">
+                          <%= select_tag :color,
+                              options_for_select(available_colors_for_current_size, variant.color.to_s),
+                              class: "cart-item__select",
+                              data: {
+                                cart_item_target: "colorSelect",
+                                action: "change->cart-item#changeColor"
+                              } %>
+                        </div>
+                      </label>
+                    </div>
+                  <% else %>
+                    <div class="cart-item__unavailable">
+                      Esta peça está indisponível no momento.
+                    </div>
+                  <% end %>
+                </div>
+
+                <div class="cart-item__side">
+                  <p class="cart-item__price">
+                    <%= money_from_cents(item.unit_price_cents) %>
+                  </p>
+
+                  <label class="cart-item__quantity">
+                    <span>Quantidade</span>
+
+                    <%= number_field_tag :quantity,
+                        item.quantity,
+                        min: 1,
+                        max: variant.stock_quantity,
+                        class: "cart-item__quantity-input",
+                        data: {
+                          cart_item_target: "quantityInput",
+                          action: "change->cart-item#changeQuantity"
+                        } %>
+                  </label>
+
+                  <p class="cart-item__subtotal">
+                    Subtotal:
+                    <strong><%= money_from_cents(item.total_cents) %></strong>
+                  </p>
+
+                  <%= link_to "Remover",
+                      cart_item_path(item),
+                      data: { turbo_method: :delete, turbo_confirm: "Remover este item do carrinho?" },
+                      class: "cart-item__remove-link" %>
+                </div>
+              <% end %>
+            </article>
+          <% end %>
+        </div>
+
+        <aside class="cart-summary">
+          <h2>Resumo do pedido</h2>
+
+          <div class="cart-summary__row">
+            <span>Itens</span>
+            <strong><%= @cart.items_count %></strong>
+          </div>
+
+          <div class="cart-summary__row">
+            <span>Subtotal</span>
+            <strong><%= money_from_cents(@cart.total_cents) %></strong>
+          </div>
+
+          <div class="cart-summary__row">
+            <span>Frete</span>
+            <strong>Calculado no checkout</strong>
+          </div>
+
+          <div class="cart-summary__total">
+            <span>Total parcial</span>
+            <strong><%= money_from_cents(@cart.total_cents) %></strong>
+          </div>
+
+          <button type="button" class="cart-summary__checkout-button" disabled>
+            Finalizar compra em breve
+          </button>
+
+          <p>
+            O checkout será implementado na próxima etapa com endereço, frete e pagamento.
+          </p>
+        </aside>
+      </div>
+    <% else %>
+      <div class="cart-empty">
+        <h2>Seu carrinho está vazio</h2>
+        <p>Escolha uma peça, selecione um tamanho e adicione ao carrinho.</p>
+
+        <%= link_to "Ver catálogo", products_path, class: "btn btn-dark btn-lg" %>
+      </div>
+    <% end %>
+  </div>
+</section>

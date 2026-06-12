@@ -1,0 +1,75 @@
+<footer class="store-footer">
+  <div class="container">
+    <div class="store-footer__main">
+      <div class="store-footer__brand">
+        <%= link_to root_path do %>
+          <span>ROSE</span>
+          <small>LINGERIE</small>
+        <% end %>
+
+        <p>
+          Moda íntima, conforto e elegância em uma experiência digital simples, moderna e segura.
+        </p>
+      </div>
+
+      <div class="store-footer__columns">
+        <div class="store-footer__column">
+          <h3>Institucional</h3>
+
+          <%= link_to "Sobre a marca", "#" %>
+          <%= link_to "Política de privacidade", "#" %>
+          <%= link_to "Termos de uso", "#" %>
+          <%= link_to "Trocas e devoluções", "#" %>
+        </div>
+
+        <div class="store-footer__column">
+          <h3>Atendimento</h3>
+
+          <%= link_to "Central de ajuda", "#" %>
+          <%= link_to "Meus pedidos", user_signed_in? ? orders_path : new_user_session_path %>
+          <%= link_to "Minha conta", user_signed_in? ? edit_user_registration_path : new_user_session_path %>
+          <%= link_to "Carrinho", cart_path %>
+        </div>
+
+        <div class="store-footer__column">
+          <h3>Catálogo</h3>
+
+          <%= link_to "Todos os produtos", products_path %>
+          <%= link_to "Mais vendidos da semana", weekly_best_sellers_path %>
+          <%= link_to "Produtos curtidos", user_signed_in? ? liked_products_path : new_user_session_path %>
+          <%= link_to "Promoções", products_path(section: "promocoes") %>
+        </div>
+
+        <div class="store-footer__column store-footer__column--contact">
+          <h3>Fale conosco</h3>
+
+          <p>
+            Precisa de ajuda com pedido, troca ou pagamento?
+          </p>
+
+          <a href="mailto:atendimento@auralingerie.com.br">
+            atendimento@roselingerie.com.br
+          </a>
+
+          <a href="tel:+5511999990000">
+            (11) 99999-0000
+          </a>
+
+          <p>
+            Atendimento de segunda a sexta, das 9h às 18h.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="store-footer__bottom">
+      <p>
+        © <%= Time.current.year %> ROSE Lingerie. Todos os direitos reservados.
+      </p>
+
+      <p>
+        CNPJ: 00.000.000/0001-00
+      </p>
+    </div>
+  </div>
+</footer>

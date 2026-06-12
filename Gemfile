@@ -44,6 +44,9 @@ gem "bootsnap", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
+gem "omniauth-google-oauth2"
+gem "omniauth-apple"
+gem "omniauth-rails_csrf_protection"
 gem "bootstrap", "~> 5.3"
 gem "devise"
 gem "autoprefixer-rails"

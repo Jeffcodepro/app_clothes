@@ -15,7 +15,21 @@ Devise.setup do |config|
   # Devise will use the `secret_key_base` as its `secret_key`
   # by default. You can change it below and use your own secret key.
   # config.secret_key = 'ea217d9771330798944bcd664efba4cec546d77d80dc56dbc488c97998903321a49ea137b69067cacdcf080f4a6c5854a84f8594e587f7a2361f36d47cfa3c7d'
+  config.omniauth :google_oauth2,
+                  ENV.fetch("GOOGLE_CLIENT_ID", nil),
+                  ENV.fetch("GOOGLE_CLIENT_SECRET", nil),
+                  scope: "email,profile",
+                  prompt: "select_account",
+                  image_aspect_ratio: "square",
+                  image_size: 96
 
+  config.omniauth :apple,
+                  ENV.fetch("APPLE_CLIENT_ID", nil),
+                  "",
+                  scope: "email name",
+                  team_id: ENV.fetch("APPLE_TEAM_ID", nil),
+                  key_id: ENV.fetch("APPLE_KEY_ID", nil),
+                  pem: ENV.fetch("APPLE_PRIVATE_KEY", "").gsub("\\n", "\n")
   # ==> Controller configuration
   # Configure the parent class to the devise controllers.
   # config.parent_controller = 'DeviseController'

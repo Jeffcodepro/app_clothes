@@ -4,6 +4,7 @@
       <%= link_to "← Voltar ao catálogo", products_path, class: "product-show__back-link" %>
       <%= link_to "Página inicial", root_path, class: "product-show__home-link" %>
     </div>
+
     <div class="product-show__layout">
       <div class="product-show__gallery">
         <% if @product.photos.attached? %>
@@ -25,8 +26,9 @@
         <% end %>
       </div>
 
-      <div class="product-show__info">
+      <div class="product-show__info" data-controller="variant-selector">
         <p class="product-show__category"><%= @product.category.name %></p>
+
         <h1><%= @product.name %></h1>
 
         <p class="product-show__price">
@@ -36,6 +38,7 @@
         <p class="product-show__description">
           <%= @product.description %>
         </p>
+
         <div class="product-show__info-grid">
           <div>
             <span>Categoria</span>
@@ -64,44 +67,82 @@
           </div>
         </div>
 
-        <div class="product-show__block">
-          <h2>Tamanhos disponíveis</h2>
+        <%= form_with url: cart_items_path,
+            method: :post,
+            local: true,
+            class: "product-show__cart-form",
+            data: { action: "submit->variant-selector#validateBeforeSubmit" } do %>
 
-          <div class="size-options">
-            <% @variants.each do |variant| %>
-              <button type="button" class="size-option">
-                <%= variant.size %>
-              </button>
-            <% end %>
+          <%= hidden_field_tag :product_variant_id, nil, data: { variant_selector_target: "variantId" } %>
+          <%= hidden_field_tag :quantity, 1 %>
+
+          <div class="product-show__block">
+            <h2>Tamanhos disponíveis</h2>
+
+            <div class="size-options">
+              <% @variants.each do |variant| %>
+                <button
+                  type="button"
+                  class="size-option product-card__size-option"
+                  data-variant-selector-target="button"
+                  data-action="click->variant-selector#select"
+                  data-size="<%= variant.size %>"
+                  data-variant-id="<%= variant.id %>"
+                  <%= "disabled" if variant.stock_quantity.zero? %>>
+                  <%= variant.size %>
+                </button>
+              <% end %>
+            </div>
           </div>
-        </div>
 
-        <div class="product-show__block">
-          <h2>Cores disponíveis</h2>
+          <div class="product-show__block">
+            <h2>Cores disponíveis</h2>
 
-          <div class="color-options">
-            <% @variants.map(&:color).uniq.each do |color| %>
-              <span><%= color %></span>
-            <% end %>
+            <div class="color-options">
+              <% @variants.map(&:color).uniq.each do |color| %>
+                <span><%= color %></span>
+              <% end %>
+            </div>
           </div>
-        </div>
 
-        <div class="product-show__freight">
-          <h2>Frete</h2>
-          <p>Informe seu CEP no checkout para calcular prazo e valor de entrega.</p>
-        </div>
-
-        <div class="product-show__actions">
-          <button class="btn btn-dark btn-lg w-100">Adicionar ao carrinho</button>
-
-          <div class="product-show__social">
-            <button class="btn btn-outline-dark">♡ Favoritar</button>
-            <button class="btn btn-outline-dark">♥ Curtir</button>
+          <div class="product-show__freight">
+            <h2>Frete</h2>
+            <p>Informe seu CEP no checkout para calcular prazo e valor de entrega.</p>
           </div>
-        </div>
+
+          <div class="product-show__details-list">
+            <div>
+              <h2>Detalhes do produto</h2>
+              <p>Peça selecionada com foco em conforto, caimento e acabamento sofisticado.</p>
+            </div>
+
+            <div>
+              <h2>Trocas e devoluções</h2>
+              <p>Você poderá consultar as condições de troca antes de finalizar a compra.</p>
+            </div>
+
+            <div>
+              <h2>Cuidados com a peça</h2>
+              <p>Recomenda-se lavagem delicada e secagem à sombra para melhor conservação.</p>
+            </div>
+          </div>
+
+          <div class="product-show__actions">
+            <button
+              type="submit"
+              class="btn btn-dark btn-lg w-100"
+              data-variant-selector-target="cartButton">
+              Adicionar ao carrinho
+            </button>
+
+            <div class="product-show__social">
+              <button type="button" class="btn btn-outline-dark">♡ Favoritar</button>
+              <button type="button" class="btn btn-outline-dark">♥ Curtir</button>
+            </div>
+          </div>
+        <% end %>
       </div>
     </div>
-    
 
     <% if @related_products.any? %>
       <div class="related-products">
