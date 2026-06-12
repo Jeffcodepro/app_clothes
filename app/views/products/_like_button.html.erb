@@ -1,0 +1,28 @@
+<% liked_by_current_user = user_signed_in? && product.likes.exists?(user_id: current_user.id) %>
+
+<div class="product-like-button-<%= product.id %>">
+  <% if user_signed_in? %>
+    <%= button_to product_like_path(product),
+        method: liked_by_current_user ? :delete : :post,
+        class: "product-card__like-button #{'is-active' if liked_by_current_user}",
+        form: {
+          class: "product-card__like-form",
+          data: { no_card_link: true }
+        },
+        data: { no_card_link: true },
+        aria: { label: liked_by_current_user ? "Remover dos curtidos" : "Adicionar aos curtidos" } do %>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 21s-8-5.4-8-12a4.6 4.6 0 0 1 8-3.1A4.6 4.6 0 0 1 20 9c0 6.6-8 12-8 12z"></path>
+      </svg>
+    <% end %>
+  <% else %>
+    <%= link_to new_user_session_path,
+        class: "product-card__like-button",
+        data: { no_card_link: true },
+        aria: { label: "Entrar para curtir produto" } do %>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 21s-8-5.4-8-12a4.6 4.6 0 0 1 8-3.1A4.6 4.6 0 0 1 20 9c0 6.6-8 12-8 12z"></path>
+      </svg>
+    <% end %>
+  <% end %>
+</div>

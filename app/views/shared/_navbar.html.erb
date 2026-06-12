@@ -16,7 +16,7 @@
       </button>
 
       <%= link_to root_path, class: "store-navbar__brand", aria: { label: "Página inicial" } do %>
-        <span class="store-navbar__brand-main">AURA</span>
+        <span class="store-navbar__brand-main">ROSE</span>
         <span class="store-navbar__brand-sub">LINGERIE</span>
       <% end %>
 
@@ -128,9 +128,7 @@
             <path d="M12 21s-8-5.4-8-12a4.6 4.6 0 0 1 8-3.1A4.6 4.6 0 0 1 20 9c0 6.6-8 12-8 12z"></path>
           </svg>
 
-          <% if likes_count.positive? %>
-            <span class="store-navbar__counter"><%= likes_count %></span>
-          <% end %>
+          <%= render "shared/navbar_liked_products_counter" %>
         <% end %>
 
         <%= link_to weekly_best_sellers_path,
@@ -188,7 +186,7 @@
 
     <div class="mobile-menu__header">
       <%= link_to root_path, class: "mobile-menu__brand" do %>
-        AURA
+        ROSE
       <% end %>
 
       <button
@@ -202,28 +200,51 @@
     </div>
 
     <div class="mobile-menu__body">
-      <div class="mobile-menu__panel is-active" data-mobile-menu-target="rootPanel">
-        <%= link_to products_path, class: "mobile-menu__featured-link" do %>
-          Ver todo o catálogo
-        <% end %>
+      <div class="mobile-menu__panel mobile-menu__panel--root is-active" data-mobile-menu-target="rootPanel">
+        <div class="mobile-menu__main-links">
+          <%= link_to products_path, class: "mobile-menu__featured-link" do %>
+            Ver todo o catálogo
+          <% end %>
 
-        <% mobile_promotion_text = @navbar_promotion&.text.presence || "Até 40% OFF♡" %>
-        <% mobile_promotion_link = @navbar_promotion&.link_url.presence || products_path(section: "promocoes") %>
+          <% mobile_promotion_text = @navbar_promotion&.text.presence || "Até 40% OFF♡" %>
+          <% mobile_promotion_link = @navbar_promotion&.link_url.presence || products_path(section: "promocoes") %>
 
-        <%= link_to mobile_promotion_link, class: "mobile-menu__row mobile-menu__row--accent" do %>
-          <span><%= mobile_promotion_text.upcase %></span>
-          <strong>›</strong>
-        <% end %>
-
-        <% (@navbar_genders || []).each do |gender| %>
-          <button
-            type="button"
-            class="mobile-menu__row mobile-menu__row-button"
-            data-gender-slug="<%= gender.slug %>"
-            data-action="click->mobile-menu#showGender">
-            <span><%= gender.name.upcase %></span>
+          <%= link_to mobile_promotion_link, class: "mobile-menu__row mobile-menu__row--accent" do %>
+            <span><%= mobile_promotion_text.upcase %></span>
             <strong>›</strong>
-          </button>
+          <% end %>
+
+          <% (@navbar_genders || []).each do |gender| %>
+            <button
+              type="button"
+              class="mobile-menu__row mobile-menu__row-button"
+              data-gender-slug="<%= gender.slug %>"
+              data-action="click->mobile-menu#showGender">
+              <span><%= gender.name.upcase %></span>
+              <strong>›</strong>
+            </button>
+          <% end %>
+        </div>
+
+        <% if user_signed_in? %>
+          <div class="mobile-menu__account mobile-menu__account--bottom">
+            <%= link_to edit_user_registration_path, class: "mobile-menu__row mobile-menu__row--account" do %>
+              <span>MINHA CONTA</span>
+              <strong>›</strong>
+            <% end %>
+
+            <%= link_to orders_path, class: "mobile-menu__row mobile-menu__row--account" do %>
+              <span>MEUS PEDIDOS</span>
+              <strong>›</strong>
+            <% end %>
+
+            <%= link_to destroy_user_session_path,
+                data: { turbo_method: :delete },
+                class: "mobile-menu__row mobile-menu__row--logout" do %>
+              <span>SAIR DA CONTA</span>
+              <strong>↵</strong>
+            <% end %>
+          </div>
         <% end %>
       </div>
 

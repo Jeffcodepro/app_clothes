@@ -1,0 +1,7 @@
+<span id="navbar-liked-products-counter">
+  <% likes_count = user_signed_in? ? current_user.likes.count : 0 %>
+
+  <% if likes_count.positive? %>
+    <span class="store-navbar__counter"><%= likes_count %></span>
+  <% end %>
+</span>

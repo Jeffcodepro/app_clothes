@@ -1,38 +1,197 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["button", "selectedSize", "variantId", "cartButton"]
+  static targets = [
+    "sizeButton",
+    "colorButton",
+    "selectedSize",
+    "selectedColor",
+    "variantId",
+    "price"
+  ]
 
-  select(event) {
+  static values = {
+    variants: Array
+  }
+
+  connect() {
+    this.updateAvailability()
+    this.updateVariantId()
+  }
+
+  selectSize(event) {
     const clickedButton = event.currentTarget
     const size = clickedButton.dataset.size
-    const variantId = clickedButton.dataset.variantId
 
-    this.buttonTargets.forEach((button) => {
-      button.classList.remove("is-selected")
-    })
+    if (clickedButton.disabled) return
 
-    clickedButton.classList.add("is-selected")
+    if (clickedButton.classList.contains("is-selected")) {
+      clickedButton.classList.remove("is-selected")
+      this.setSelectedSize("")
+    } else {
+      this.sizeButtonTargets.forEach((button) => {
+        button.classList.remove("is-selected")
+      })
 
-    if (this.hasSelectedSizeTarget) {
-      this.selectedSizeTarget.textContent = size
+      clickedButton.classList.add("is-selected")
+      this.setSelectedSize(size)
     }
 
-    if (this.hasVariantIdTarget) {
-      this.variantIdTarget.value = variantId
+    this.updateAvailability()
+    this.updateVariantId()
+  }
+
+  selectColor(event) {
+    const clickedButton = event.currentTarget
+    const color = clickedButton.dataset.color
+
+    if (clickedButton.disabled) return
+
+    if (clickedButton.classList.contains("is-selected")) {
+      clickedButton.classList.remove("is-selected")
+      this.setSelectedColor("")
+    } else {
+      this.colorButtonTargets.forEach((button) => {
+        button.classList.remove("is-selected")
+      })
+
+      clickedButton.classList.add("is-selected")
+      this.setSelectedColor(color)
     }
+
+    this.updateAvailability()
+    this.updateVariantId()
   }
 
   validateBeforeSubmit(event) {
-    if (!this.hasVariantIdTarget || this.variantIdTarget.value) return
+    const selectedSize = this.selectedSize()
+    const selectedColor = this.selectedColor()
+    const selectedVariant = this.selectedVariant()
+
+    if (selectedSize && selectedColor && selectedVariant) return
 
     event.preventDefault()
 
+    let message = "Para adicionar esta peça ao carrinho, selecione tamanho e cor."
+
+    if (!selectedSize && selectedColor) {
+      message = "Escolha um tamanho disponível antes de adicionar ao carrinho."
+    }
+
+    if (selectedSize && !selectedColor) {
+      message = "Escolha uma cor disponível antes de adicionar ao carrinho."
+    }
+
+    if (selectedSize && selectedColor && !selectedVariant) {
+      message = "Essa combinação de tamanho e cor não está disponível no momento."
+    }
+
     this.showSweetAlert({
-      title: "Escolha um tamanho",
-      message: "Para adicionar esta peça ao carrinho, selecione um tamanho disponível.",
+      title: "Complete a seleção",
+      message: message,
       buttonText: "Entendi"
     })
+  }
+
+  updateAvailability() {
+    const selectedSize = this.selectedSize()
+    const selectedColor = this.selectedColor()
+
+    if (this.hasColorButtonTarget) {
+      this.colorButtonTargets.forEach((button) => {
+        const color = button.dataset.color
+
+        const isAvailable = this.variantsValue.some((variant) => {
+          return String(variant.color) === String(color) &&
+                 (!selectedSize || String(variant.size) === String(selectedSize)) &&
+                 Number(variant.stock) > 0
+        })
+
+        button.disabled = !isAvailable
+
+        if (!isAvailable) {
+          button.classList.remove("is-selected")
+        }
+      })
+    }
+
+    if (this.hasSizeButtonTarget) {
+      this.sizeButtonTargets.forEach((button) => {
+        const size = button.dataset.size
+
+        const isAvailable = this.variantsValue.some((variant) => {
+          return String(variant.size) === String(size) &&
+                 (!selectedColor || String(variant.color) === String(selectedColor)) &&
+                 Number(variant.stock) > 0
+        })
+
+        button.disabled = !isAvailable
+
+        if (!isAvailable) {
+          button.classList.remove("is-selected")
+        }
+      })
+    }
+
+    this.syncSelectedLabels()
+  }
+
+  updateVariantId() {
+    const variant = this.selectedVariant()
+
+    if (this.hasVariantIdTarget) {
+      this.variantIdTarget.value = variant ? variant.id : ""
+    }
+
+    if (variant && this.hasPriceTarget) {
+      this.priceTarget.textContent = variant.price_label
+    }
+  }
+
+  selectedVariant() {
+    const selectedSize = this.selectedSize()
+    const selectedColor = this.selectedColor()
+
+    if (!selectedSize || !selectedColor) return null
+
+    return this.variantsValue.find((variant) => {
+      return String(variant.size) === String(selectedSize) &&
+             String(variant.color) === String(selectedColor) &&
+             Number(variant.stock) > 0
+    })
+  }
+
+  selectedSize() {
+    const selectedButton = this.hasSizeButtonTarget
+      ? this.sizeButtonTargets.find((button) => button.classList.contains("is-selected"))
+      : null
+
+    return selectedButton ? selectedButton.dataset.size : ""
+  }
+
+  selectedColor() {
+    const selectedButton = this.hasColorButtonTarget
+      ? this.colorButtonTargets.find((button) => button.classList.contains("is-selected"))
+      : null
+
+    return selectedButton ? selectedButton.dataset.color : ""
+  }
+
+  setSelectedSize(size) {
+    if (this.hasSelectedSizeTarget) {
+      this.selectedSizeTarget.textContent = size || "Selecione"
+    }
+  }
+
+  setSelectedColor(color) {
+    if (this.hasSelectedColorTarget) {
+      this.selectedColorTarget.textContent = color || "Selecione"
+    }
+  }
+
+  syncSelectedLabels() {
+    this.setSelectedSize(this.selectedSize())
+    this.setSelectedColor(this.selectedColor())
   }
 
   showSweetAlert({ title, message, buttonText }) {
