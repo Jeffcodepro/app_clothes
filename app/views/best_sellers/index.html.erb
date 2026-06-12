@@ -1,0 +1,51 @@
+<section class="catalog-header">
+  <div class="container">
+    <p>Ranking semanal</p>
+
+    <% if @gender.present? %>
+      <h1>Mais vendidos de <%= @gender.name %></h1>
+
+      <span>
+        Produtos mais vendidos da semana no universo <%= @gender.name.downcase %>.
+      </span>
+    <% else %>
+      <h1>Mais vendidos da semana</h1>
+
+      <span>
+        Lista geral com os produtos mais vendidos da semana em todo o catálogo.
+      </span>
+    <% end %>
+  </div>
+</section>
+
+<section class="catalog-section">
+  <div class="container">
+    <div class="catalog-content catalog-content--full">
+      <% if @products.any? %>
+        <div class="products-grid">
+          <% @products.each_with_index do |product, index| %>
+            <%= render "products/product_card",
+                product: product,
+                highlight: (index + 1) % 5 == 0 %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state">
+          <% if @gender.present? %>
+            <p>Ainda não temos produtos vendidos nesta semana para <%= @gender.name.downcase %>.</p>
+
+            <%= link_to "Ver produtos de #{@gender.name}",
+                products_path(gender: @gender.slug),
+                class: "btn btn-dark mt-3" %>
+          <% else %>
+            <p>Ainda não temos produtos vendidos nesta semana.</p>
+
+            <%= link_to "Ver catálogo",
+                products_path,
+                class: "btn btn-dark mt-3" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

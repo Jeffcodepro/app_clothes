@@ -1,0 +1,133 @@
+.store-footer {
+  background: #111;
+  color: #fff;
+  padding: 64px 0 28px;
+}
+
+.store-footer__main {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 72px;
+  padding-bottom: 44px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.store-footer__brand {
+  a {
+    display: inline-flex;
+    flex-direction: column;
+    color: #fff;
+    text-decoration: none;
+    line-height: 0.9;
+    margin-bottom: 20px;
+  }
+
+  span {
+    font-size: 2.4rem;
+    font-weight: 900;
+    letter-spacing: -0.06em;
+  }
+
+  small {
+    margin-top: 8px;
+    color: #d9a6b0;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.38em;
+  }
+
+  p {
+    color: #c7c7c7;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+.store-footer__columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.store-footer__column {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 900;
+    color: #fff;
+  }
+
+  a {
+    color: #c7c7c7;
+    text-decoration: none;
+    font-size: 0.92rem;
+
+    &:hover {
+      color: #fff;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+  }
+
+  p {
+    margin: 0;
+    color: #c7c7c7;
+    line-height: 1.6;
+    font-size: 0.92rem;
+  }
+
+  strong {
+    color: #fff;
+  }
+}
+
+.store-footer__column--contact {
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.store-footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 24px;
+
+  p {
+    margin: 0;
+    color: #aaa;
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .store-footer__main {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .store-footer__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .store-footer {
+    padding: 48px 0 24px;
+  }
+
+  .store-footer__columns {
+    grid-template-columns: 1fr;
+  }
+
+  .store-footer__bottom {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

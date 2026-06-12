@@ -1,27 +1,44 @@
-<h2>Change your password</h2>
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__brand">
+      <%= link_to root_path do %>
+        <span>AURA</span>
+        <small>LINGERIE</small>
+      <% end %>
+    </div>
 
-<%= simple_form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
-  <%= f.error_notification %>
+    <div class="auth-card__heading">
+      <p>Nova senha</p>
+      <h1>Redefinir senha</h1>
+      <span>Crie uma nova senha segura para acessar sua conta.</span>
+    </div>
 
-  <%= f.input :reset_password_token, as: :hidden %>
-  <%= f.full_error :reset_password_token %>
+    <%= simple_form_for(resource,
+        as: resource_name,
+        url: password_path(resource_name),
+        html: { method: :put, class: "auth-form" }) do |f| %>
 
-  <div class="form-inputs">
-    <%= f.input :password,
-                label: "New password",
-                required: true,
-                autofocus: true,
-                hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length),
-                input_html: { autocomplete: "new-password" } %>
-    <%= f.input :password_confirmation,
-                label: "Confirm your new password",
-                required: true,
-                input_html: { autocomplete: "new-password" } %>
+      <%= f.error_notification %>
+      <%= f.input :reset_password_token, as: :hidden %>
+
+      <%= f.input :password,
+          label: "Nova senha",
+          required: true,
+          autofocus: true,
+          hint: ("mínimo de #{@minimum_password_length} caracteres" if @minimum_password_length),
+          input_html: { autocomplete: "new-password" } %>
+
+      <%= f.input :password_confirmation,
+          label: "Confirmar nova senha",
+          required: true,
+          input_html: { autocomplete: "new-password" } %>
+
+      <%= f.button :submit, "Alterar senha", class: "auth-form__submit" %>
+    <% end %>
+
+    <div class="auth-card__footer">
+      <span>Já redefiniu?</span>
+      <%= link_to "Entrar", new_session_path(resource_name) %>
+    </div>
   </div>
-
-  <div class="form-actions">
-    <%= f.button :submit, "Change my password" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</section>

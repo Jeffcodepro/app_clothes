@@ -3,19 +3,6 @@
   data-controller="mobile-menu"
   data-action="keydown@window->mobile-menu#closeWithKeyboard">
 
-  <% if user_signed_in? %>
-    <div class="store-navbar__top">
-      <div class="container store-navbar__top-inner">
-        <div class="store-navbar__top-links">
-          <%= link_to "ajuda", "#" %>
-          <%= link_to "histórico de pedidos", orders_path %>
-          <%= link_to "minha conta", edit_user_registration_path %>
-          <%= link_to "sair", destroy_user_session_path, data: { turbo_method: :delete } %>
-        </div>
-      </div>
-    </div>
-  <% end %>
-
   <div class="store-navbar__main">
     <div class="container store-navbar__main-inner">
       <button
@@ -48,7 +35,7 @@
                   <h3>Destaques</h3>
 
                   <%= link_to "Novidades", products_path(gender: gender.slug, section: "novidades") %>
-                  <%= link_to "Mais vendidos", products_path(gender: gender.slug, section: "destaques-da-semana") %>
+                  <%= link_to "Mais vendidos", weekly_best_sellers_path(gender: gender.slug) %>
                   <%= link_to "Conforto diário", products_path(gender: gender.slug, section: "conforto-diario") %>
                   <%= link_to "Promoções", products_path(gender: gender.slug, section: "promocoes") %>
                 </div>
@@ -110,14 +97,20 @@
         <% end %>
 
         <% if user_signed_in? %>
-          <%= link_to edit_user_registration_path, class: "store-navbar__icon-link", aria: { label: "Minha conta" } do %>
+          <%= link_to edit_user_registration_path,
+              class: "store-navbar__icon-link",
+              aria: { label: "Minha conta" },
+              title: "Minha conta" do %>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="12" cy="7" r="4"></circle>
               <path d="M4 21c1.6-4.5 14.4-4.5 16 0"></path>
             </svg>
           <% end %>
         <% else %>
-          <%= link_to new_user_session_path, class: "store-navbar__icon-link", aria: { label: "Entrar" } do %>
+          <%= link_to new_user_session_path,
+              class: "store-navbar__icon-link",
+              aria: { label: "Entrar" },
+              title: "Entrar" do %>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="12" cy="7" r="4"></circle>
               <path d="M4 21c1.6-4.5 14.4-4.5 16 0"></path>
@@ -125,26 +118,57 @@
           <% end %>
         <% end %>
 
-        <%= link_to products_path, class: "store-navbar__icon-link store-navbar__icon-link--desktop", aria: { label: "Favoritos" } do %>
+        <% likes_count = user_signed_in? ? current_user.likes.count : 0 %>
+
+        <%= link_to user_signed_in? ? liked_products_path : new_user_session_path,
+            class: "store-navbar__icon-link",
+            aria: { label: "Produtos curtidos" },
+            title: "Produtos curtidos" do %>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 21s-8-5.4-8-12a4.6 4.6 0 0 1 8-3.1A4.6 4.6 0 0 1 20 9c0 6.6-8 12-8 12z"></path>
           </svg>
 
-          <% if user_signed_in? && current_user.respond_to?(:favorites) %>
-            <span class="store-navbar__counter"><%= current_user.favorites.count %></span>
+          <% if likes_count.positive? %>
+            <span class="store-navbar__counter"><%= likes_count %></span>
           <% end %>
         <% end %>
 
-        <%= link_to cart_path, class: "store-navbar__icon-link", aria: { label: "Carrinho" } do %>
+        <%= link_to weekly_best_sellers_path,
+            class: "store-navbar__icon-link store-navbar__icon-link--desktop",
+            aria: { label: "Mais vendidos da semana" },
+            title: "Mais vendidos da semana" do %>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2.7l2.8 5.8 6.4.9-4.6 4.5 1.1 6.3L12 17.2 6.3 20.2l1.1-6.3-4.6-4.5 6.4-.9L12 2.7z"></path>
+          </svg>
+        <% end %>
+
+        <% cart_quantity = user_signed_in? && current_user.cart.present? ? current_user.cart.cart_items.sum(:quantity) : 0 %>
+
+        <%= link_to cart_path,
+            class: "store-navbar__icon-link",
+            aria: { label: "Carrinho" },
+            title: "Carrinho" do %>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M6 8h12l-1 13H7L6 8z"></path>
             <path d="M9 8a3 3 0 0 1 6 0"></path>
           </svg>
 
-          <% if user_signed_in? && current_user.cart.present? %>
-            <span class="store-navbar__counter"><%= current_user.cart.cart_items.sum(:quantity) %></span>
-          <% else %>
-            <span class="store-navbar__counter">0</span>
+          <% if cart_quantity.positive? %>
+            <span class="store-navbar__counter"><%= cart_quantity %></span>
+          <% end %>
+        <% end %>
+
+        <% if user_signed_in? %>
+          <%= link_to destroy_user_session_path,
+              data: { turbo_method: :delete },
+              class: "store-navbar__icon-link store-navbar__logout-link",
+              aria: { label: "Sair" },
+              title: "Sair" do %>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <path d="M10 17l5-5-5-5"></path>
+              <path d="M15 12H3"></path>
+            </svg>
           <% end %>
         <% end %>
       </div>
@@ -183,11 +207,11 @@
           Ver todo o catálogo
         <% end %>
 
-        <% promotion_text = @navbar_promotion&.text.presence || "Até 40% OFF♡" %>
-        <% promotion_link = @navbar_promotion&.link_url.presence || products_path(section: "promocoes") %>
+        <% mobile_promotion_text = @navbar_promotion&.text.presence || "Até 40% OFF♡" %>
+        <% mobile_promotion_link = @navbar_promotion&.link_url.presence || products_path(section: "promocoes") %>
 
-        <%= link_to promotion_link, class: "mobile-menu__row mobile-menu__row--accent" do %>
-          <span><%= promotion_text.upcase %></span>
+        <%= link_to mobile_promotion_link, class: "mobile-menu__row mobile-menu__row--accent" do %>
+          <span><%= mobile_promotion_text.upcase %></span>
           <strong>›</strong>
         <% end %>
 

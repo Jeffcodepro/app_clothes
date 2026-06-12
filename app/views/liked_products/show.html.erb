@@ -1,0 +1,34 @@
+<section class="catalog-header">
+  <div class="container">
+    <p>Minha conta</p>
+    <h1>Produtos curtidos</h1>
+
+    <span>
+      <%= pluralize(@products.count, "produto curtido", "produtos curtidos") %>
+    </span>
+  </div>
+</section>
+
+<section class="catalog-section">
+  <div class="container">
+    <div class="catalog-content catalog-content--full">
+      <% if @products.any? %>
+        <div class="products-grid">
+          <% @products.each_with_index do |product, index| %>
+            <%= render "products/product_card",
+                product: product,
+                highlight: (index + 1) % 5 == 0 %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state">
+          <p>Você ainda não curtiu nenhum produto.</p>
+
+          <%= link_to "Explorar catálogo",
+              products_path,
+              class: "btn btn-dark mt-3" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
