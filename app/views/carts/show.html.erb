@@ -36,6 +36,22 @@
               data-controller="cart-item"
               data-cart-item-variants-value="<%= json_escape(variants_payload.to_json) %>">
 
+              <%= link_to cart_item_path(item),
+                  data: {
+                    turbo_method: :delete,
+                    turbo_confirm: "Deseja remover este item da sacola?"
+                  },
+                  class: "cart-item__remove-icon",
+                  aria: { label: "Remover item" } do %>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 7h16"></path>
+                  <path d="M10 11v6"></path>
+                  <path d="M14 11v6"></path>
+                  <path d="M6 7l1 14h10l1-14"></path>
+                  <path d="M9 7V4h6v3"></path>
+                </svg>
+              <% end %>
+
               <%= link_to product_path(product), class: "cart-item__image" do %>
                 <% if product.photos.attached? %>
                   <%= image_tag product.photos.first, alt: product.name %>
@@ -64,8 +80,8 @@
                   </h2>
 
                   <% if available_variants.any? %>
-                    <div class="cart-item__selectors">
-                      <label class="cart-item__selector">
+                    <div class="cart-item__controls">
+                      <label class="cart-item__selector cart-item__selector--size">
                         <span>Tamanho</span>
 
                         <div class="cart-item__select-wrapper">
@@ -79,7 +95,7 @@
                         </div>
                       </label>
 
-                      <label class="cart-item__selector">
+                      <label class="cart-item__selector cart-item__selector--color">
                         <span>Cor</span>
 
                         <div class="cart-item__select-wrapper">
@@ -92,42 +108,38 @@
                               } %>
                         </div>
                       </label>
+
+                      <label class="cart-item__quantity">
+                        <span>Qtd.</span>
+
+                        <%= number_field_tag :quantity,
+                            item.quantity,
+                            min: 1,
+                            max: variant.stock_quantity,
+                            class: "cart-item__quantity-input",
+                            data: {
+                              cart_item_target: "quantityInput",
+                              action: "change->cart-item#changeQuantity"
+                            } %>
+                      </label>
                     </div>
                   <% else %>
                     <div class="cart-item__unavailable">
                       Esta peça está indisponível no momento.
                     </div>
                   <% end %>
-                </div>
 
-                <div class="cart-item__side">
-                  <p class="cart-item__price">
-                    <%= money_from_cents(item.unit_price_cents) %>
-                  </p>
+                  <div class="cart-item__pricing-row">
+                    <div class="cart-item__unit-price">
+                      <span>Preço un.</span>
+                      <strong><%= money_from_cents(item.unit_price_cents) %></strong>
+                    </div>
 
-                  <label class="cart-item__quantity">
-                    <span>Quantidade</span>
-
-                    <%= number_field_tag :quantity,
-                        item.quantity,
-                        min: 1,
-                        max: variant.stock_quantity,
-                        class: "cart-item__quantity-input",
-                        data: {
-                          cart_item_target: "quantityInput",
-                          action: "change->cart-item#changeQuantity"
-                        } %>
-                  </label>
-
-                  <p class="cart-item__subtotal">
-                    Subtotal:
-                    <strong><%= money_from_cents(item.total_cents) %></strong>
-                  </p>
-
-                  <%= link_to "Remover",
-                      cart_item_path(item),
-                      data: { turbo_method: :delete, turbo_confirm: "Remover este item do carrinho?" },
-                      class: "cart-item__remove-link" %>
+                    <p class="cart-item__subtotal">
+                      <span>Subtotal</span>
+                      <strong><%= money_from_cents(item.total_cents) %></strong>
+                    </p>
+                  </div>
                 </div>
               <% end %>
             </article>

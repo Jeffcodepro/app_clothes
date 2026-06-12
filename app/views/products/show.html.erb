@@ -1,3 +1,18 @@
+<% available_variants = @variants.select { |variant| variant.active? && variant.stock_quantity.positive? } %>
+<% available_sizes = available_variants.map { |variant| variant.size.to_s }.uniq %>
+<% available_colors = available_variants.map { |variant| variant.color.to_s }.uniq %>
+
+<% variants_payload = available_variants.map do |variant|
+  {
+    id: variant.id,
+    size: variant.size.to_s,
+    color: variant.color.to_s,
+    stock: variant.stock_quantity,
+    price_cents: variant.price_cents,
+    price_label: money_from_cents(variant.price_cents)
+  }
+end %>
+
 <section class="product-show">
   <div class="container">
     <div class="product-show__navigation">
@@ -26,12 +41,16 @@
         <% end %>
       </div>
 
-      <div class="product-show__info" data-controller="variant-selector">
+      <div
+        class="product-show__info"
+        data-controller="variant-selector"
+        data-variant-selector-variants-value="<%= json_escape(variants_payload.to_json) %>">
+
         <p class="product-show__category"><%= @product.category.name %></p>
 
         <h1><%= @product.name %></h1>
 
-        <p class="product-show__price">
+        <p class="product-show__price" data-variant-selector-target="price">
           <%= money_from_cents(@product.display_price_cents) %>
         </p>
 
@@ -77,30 +96,43 @@
           <%= hidden_field_tag :quantity, 1 %>
 
           <div class="product-show__block">
-            <h2>Tamanhos disponíveis</h2>
+            <div class="product-show__block-heading">
+              <h2>Tamanhos disponíveis</h2>
+              <span data-variant-selector-target="selectedSize">Selecione</span>
+            </div>
 
             <div class="size-options">
-              <% @variants.each do |variant| %>
+              <% available_sizes.each do |size| %>
                 <button
                   type="button"
                   class="size-option product-card__size-option"
-                  data-variant-selector-target="button"
-                  data-action="click->variant-selector#select"
-                  data-size="<%= variant.size %>"
-                  data-variant-id="<%= variant.id %>"
-                  <%= "disabled" if variant.stock_quantity.zero? %>>
-                  <%= variant.size %>
+                  data-variant-selector-target="sizeButton"
+                  data-action="click->variant-selector#selectSize"
+                  data-size="<%= size %>">
+                  <%= size %>
                 </button>
               <% end %>
             </div>
           </div>
 
           <div class="product-show__block">
-            <h2>Cores disponíveis</h2>
+            <div class="product-show__block-heading">
+              <h2>Cores disponíveis</h2>
+              <span data-variant-selector-target="selectedColor">Selecione</span>
+            </div>
 
-            <div class="color-options">
-              <% @variants.map(&:color).uniq.each do |color| %>
-                <span><%= color %></span>
+            <div class="product-show__color-options">
+              <% available_colors.each do |color| %>
+                <button
+                  type="button"
+                  class="product-show__color-option <%= 'is-light' if light_color?(color) %>"
+                  style="<%= color_swatch_style(color) %>"
+                  data-variant-selector-target="colorButton"
+                  data-action="click->variant-selector#selectColor"
+                  data-color="<%= color %>"
+                  aria-label="Selecionar cor <%= color %>"
+                  title="<%= color %>">
+                </button>
               <% end %>
             </div>
           </div>
@@ -130,8 +162,7 @@
           <div class="product-show__actions">
             <button
               type="submit"
-              class="btn btn-dark btn-lg w-100"
-              data-variant-selector-target="cartButton">
+              class="btn btn-dark btn-lg w-100">
               Adicionar ao carrinho
             </button>
 

@@ -1,9 +1,22 @@
-<% size_groups = product.product_variants.select(&:active?).group_by(&:size) %>
-<% liked_by_current_user = user_signed_in? && product.likes.any? { |like| like.user_id == current_user.id } %>
+<% available_variants = product.product_variants.select { |variant| variant.active? && variant.stock_quantity.positive? } %>
+<% available_sizes = available_variants.map { |variant| variant.size.to_s }.uniq %>
+<% available_colors = available_variants.map { |variant| variant.color.to_s }.uniq %>
+
+<% variants_payload = available_variants.map do |variant|
+  {
+    id: variant.id,
+    size: variant.size.to_s,
+    color: variant.color.to_s,
+    stock: variant.stock_quantity,
+    price_cents: variant.price_cents,
+    price_label: money_from_cents(variant.price_cents)
+  }
+end %>
 
 <article
   class="product-card <%= 'product-card--highlight' if local_assigns[:highlight] %>"
   data-controller="variant-selector product-card"
+  data-variant-selector-variants-value="<%= json_escape(variants_payload.to_json) %>"
   data-product-card-url-value="<%= product_path(product) %>"
   data-action="click->product-card#open keydown->product-card#openWithKeyboard">
 
@@ -16,21 +29,7 @@
       </div>
     <% end %>
 
-    <% liked_by_current_user = user_signed_in? && product.likes.any? { |like| like.user_id == current_user.id } %>
-
-    <%= button_to product_like_path(product),
-        method: liked_by_current_user ? :delete : :post,
-        class: "product-card__like-button #{'is-active' if liked_by_current_user}",
-        form: {
-          class: "product-card__like-form",
-          data: { no_card_link: true }
-        },
-        data: { no_card_link: true },
-        aria: { label: liked_by_current_user ? "Remover dos curtidos" : "Adicionar aos curtidos" } do %>
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 21s-8-5.4-8-12a4.6 4.6 0 0 1 8-3.1A4.6 4.6 0 0 1 20 9c0 6.6-8 12-8 12z"></path>
-      </svg>
-    <% end %>
+    <%= render "products/like_button", product: product %>
 
     <div class="product-card__badges">
       <% if product.featured? %>
@@ -51,7 +50,7 @@
     <div class="product-card__title-row">
       <h3><%= product.name %></h3>
 
-      <span class="product-card__price">
+      <span class="product-card__price" data-variant-selector-target="price">
         <%= money_from_cents(product.display_price_cents) %>
       </span>
     </div>
@@ -72,7 +71,7 @@
       <%= hidden_field_tag :product_variant_id, nil, data: { variant_selector_target: "variantId" } %>
       <%= hidden_field_tag :quantity, 1 %>
 
-      <% if size_groups.any? %>
+      <% if available_sizes.any? %>
         <div class="product-card__sizes" data-no-card-link>
           <div class="product-card__sizes-header">
             <span>Tamanho</span>
@@ -80,19 +79,14 @@
           </div>
 
           <div class="product-card__size-options">
-            <% size_groups.each do |size, variants| %>
-              <% stock = variants.sum(&:stock_quantity) %>
-              <% variant = variants.first %>
-
+            <% available_sizes.each do |size| %>
               <button
                 type="button"
                 class="product-card__size-option"
                 data-no-card-link
-                data-variant-selector-target="button"
-                data-action="click->variant-selector#select"
-                data-size="<%= size %>"
-                data-variant-id="<%= variant.id %>"
-                <%= "disabled" if stock.zero? %>>
+                data-variant-selector-target="sizeButton"
+                data-action="click->variant-selector#selectSize"
+                data-size="<%= size %>">
                 <%= size %>
               </button>
             <% end %>
@@ -100,17 +94,32 @@
         </div>
       <% end %>
 
-      <div class="product-card__meta">
-        <% if product.available_colors.any? %>
-          <span>Cores: <%= product.available_colors.join(", ") %></span>
-        <% end %>
-      </div>
+      <% if available_colors.any? %>
+        <div class="product-card__colors" data-no-card-link>
+          <div class="product-card__colors-header">
+            <span>Cor</span>
+            <small data-variant-selector-target="selectedColor">Selecione</small>
+          </div>
+
+          <div class="product-card__color-options">
+            <% available_colors.each do |color| %>
+              <button
+                type="button"
+                class="product-card__color-option <%= 'is-light' if light_color?(color) %>"
+                style="<%= color_swatch_style(color) %>"
+                data-no-card-link
+                data-variant-selector-target="colorButton"
+                data-action="click->variant-selector#selectColor"
+                data-color="<%= color %>"
+                aria-label="Selecionar cor <%= color %>"
+                title="<%= color %>">
+              </button>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
 
       <div class="product-card__footer">
-        <span class="product-card__likes-count">
-          <%= pluralize(product.likes.count, "curtida", "curtidas") %>
-        </span>
-
         <% if product.in_stock? %>
           <span class="product-card__stock product-card__stock--available">Disponível</span>
         <% else %>
@@ -121,8 +130,7 @@
       <button
         type="submit"
         class="product-card__cart-button"
-        data-no-card-link
-        data-variant-selector-target="cartButton">
+        data-no-card-link>
         Adicionar ao carrinho
       </button>
     <% end %>
